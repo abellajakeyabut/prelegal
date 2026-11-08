@@ -102,7 +102,7 @@ If a one-click PDF file with no dialog is required, switch to `@react-pdf/render
 
 ```
 frontend/
-  package.json                       + react-markdown, remark-gfm, (dev) vitest
+  package.json                       + react-markdown, remark-gfm; "test": node --test
   src/app/page.tsx                   replace boilerplate with link to /nda
   src/app/nda/page.tsx               server component: load templates
   src/components/nda/NdaBuilder.tsx
@@ -120,7 +120,7 @@ README.md                            document the /nda feature
 
 ## 7. Testing & acceptance
 
-**Unit tests (vitest)**
+**Unit tests (`node --test`; chosen over vitest to avoid a dev dependency and an @types/node bump)**
 - `renderNda` with all fields filled: none of the original bracketed placeholders remain, and every value appears.
 - Each term option (`fixed` with N years, `untilTerminated`, `perpetual`) checks exactly one box.
 - Every `<span …>` and `<label>` tag is removed from the output.
