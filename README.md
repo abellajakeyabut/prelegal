@@ -4,8 +4,24 @@ Monorepo for the Prelegal web app.
 
 | Folder      | Stack                                   | Dev URL                      |
 |-------------|-----------------------------------------|------------------------------|
-| `backend/`  | Python 3.13, FastAPI, uv, pytest, ruff  | http://localhost:8000/docs   |
-| `frontend/` | Next.js (App Router), TypeScript, Tailwind | http://localhost:3000     |
+| `backend/`  | Python 3.13, FastAPI, uv, SQLite, pytest, ruff | http://localhost:8000/docs |
+| `frontend/` | Next.js (App Router, static export), TypeScript, Tailwind | http://localhost:3000 |
+
+In production everything runs in one Docker container: Next.js is built as static
+HTML and FastAPI serves it at `/` alongside the API at `/api`, on port 8000.
+
+## Run with Docker
+
+```bash
+scripts/start-mac.sh      # or start-linux.sh, or scripts\start-windows.ps1
+# open http://localhost:8000
+scripts/stop-mac.sh       # or stop-linux.sh, or scripts\stop-windows.ps1
+```
+
+- **Login** is fake for now: any email and password are accepted and kept in the
+  browser's `localStorage`. Every page except `/login` redirects there when logged out.
+- **Database** is a temporary SQLite file (`backend/src/app/db/schema.sql`) that is
+  deleted and recreated empty every time the app starts.
 
 ## Features
 
@@ -45,6 +61,7 @@ npm run dev
 ```bash
 cd backend && uv run pytest && uv run ruff check .
 cd frontend && npm test && npm run lint && npm run build
+scripts/test-integration.sh   # builds and runs the Docker image end to end
 ```
 
 Frontend unit tests use Node's built-in test runner (`node --test`, Node 24+ for

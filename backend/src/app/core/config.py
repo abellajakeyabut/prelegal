@@ -1,4 +1,5 @@
 from functools import lru_cache
+from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -10,6 +11,8 @@ class Settings(BaseSettings):
     environment: str = "development"
     api_prefix: str = "/api"
     cors_origins: list[str] = ["http://localhost:3000"]
+    database_path: Path = Path("prelegal.db")
+    static_dir: Path = Path("../frontend/out")
 
 
 @lru_cache

@@ -1,4 +1,6 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api";
+// Same origin in the Docker image (FastAPI serves the frontend); `next dev` sets
+// NEXT_PUBLIC_API_URL to reach the separately running backend.
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "/api";
 
 export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${API_URL}${path}`, {
