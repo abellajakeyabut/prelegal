@@ -12,7 +12,10 @@ HTML and FastAPI serves it at `/` alongside the API at `/api`, on port 8000.
 
 ## Run with Docker
 
+Put your OpenRouter key in a `.env` file at the repo root (it is git-ignored):
+
 ```bash
+echo "OPENROUTER_API_KEY=sk-or-..." > .env
 scripts/start-mac.sh      # or start-linux.sh, or scripts\start-windows.ps1
 # open http://localhost:8000
 scripts/stop-mac.sh       # or stop-linux.sh, or scripts\stop-windows.ps1
@@ -25,11 +28,15 @@ scripts/stop-mac.sh       # or stop-linux.sh, or scripts\stop-windows.ps1
 
 ## Features
 
-- **Mutual NDA Creator** (`/nda`): fill in the key terms in a form, see the
-  [Common Paper Mutual NDA](templates/Mutual-NDA-coverpage.md) completed live,
-  and download it as PDF (browser "Save as PDF") or Markdown. Everything runs
-  in the browser; drafts are kept in `localStorage`. See [docs/PLAN.md](docs/PLAN.md).
-  The page reads `templates/` from the repo root, so run the frontend from `frontend/`.
+- **Mutual NDA Creator** (`/nda`): chat with an AI assistant that asks about the
+  agreement and fills in the
+  [Common Paper Mutual NDA](templates/Mutual-NDA-coverpage.md) as you answer. The
+  preview updates live, and the finished NDA downloads as PDF (browser "Save as PDF")
+  or Markdown. The conversation and draft are kept in `localStorage`.
+  - `POST /api/chat` takes the conversation and current fields, and returns the
+    assistant's reply and updated fields. It calls `gpt-oss-120b` through OpenRouter
+    with Cerebras as the provider, using Structured Outputs (`backend/src/app/nda/`).
+  - The page reads `templates/` from the repo root, so run the frontend from `frontend/`.
 
 Legal templates live in [`templates/`](templates/) (CC BY 4.0, see
 [`templates/LICENSE.txt`](templates/LICENSE.txt)) and are indexed in

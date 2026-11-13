@@ -52,3 +52,9 @@ export const US_STATES = [
   "Wisconsin",
   "Wyoming",
 ] as const;
+
+/** The state's canonical name if `value` matches one ignoring case and spaces; else `value`. */
+export function normalizeState(value: string): string {
+  const key = value.trim().toLowerCase();
+  return US_STATES.find((state) => state.toLowerCase() === key) ?? value;
+}

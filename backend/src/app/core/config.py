@@ -5,7 +5,10 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
+    # The repo-root .env holds secrets (OPENROUTER_API_KEY); backend/.env wins on conflicts.
+    model_config = SettingsConfigDict(
+        env_file=("../.env", ".env"), env_file_encoding="utf-8", extra="ignore"
+    )
 
     app_name: str = "Prelegal API"
     environment: str = "development"
@@ -13,6 +16,7 @@ class Settings(BaseSettings):
     cors_origins: list[str] = ["http://localhost:3000"]
     database_path: Path = Path("prelegal.db")
     static_dir: Path = Path("../frontend/out")
+    openrouter_api_key: str = ""
 
 
 @lru_cache

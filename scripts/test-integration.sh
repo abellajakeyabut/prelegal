@@ -41,6 +41,20 @@ check /login 'Log in'
 check /nda 'Mutual NDA Creator'
 check /nda/ 'Standard Terms'
 
+# One live AI chat turn (needs OPENROUTER_API_KEY in .env).
+chat_body='{"messages":[{"role":"user","content":"We are Acme Inc. and want Delaware law."}],
+  "fields":{"purpose":"x","effectiveDate":"2026-11-14","mndaTermType":"fixed","mndaTermYears":"1",
+  "confidentialityType":"fixed","confidentialityYears":"1","governingLaw":"","jurisdiction":"",
+  "modifications":"","party1":{"name":"","title":"","company":"","noticeAddress":""},
+  "party2":{"name":"","title":"","company":"","noticeAddress":""}}}'
+if curl -fs -X POST "$BASE/api/chat" -H 'Content-Type: application/json' -d "$chat_body" \
+  | grep -q '"governingLaw":"Delaware"'; then
+  echo "ok   /api/chat"
+else
+  echo "FAIL /api/chat" >&2
+  exit 1
+fi
+
 docker exec prelegal uv run --no-sync python -c \
   "import sqlite3; c = sqlite3.connect('prelegal.db'); c.execute(\"INSERT INTO users (email) VALUES ('a@example.com')\"); c.commit()"
 [ "$(user_count)" = 1 ] || { echo "FAIL: insert" >&2; exit 1; }
