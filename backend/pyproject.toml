@@ -9,6 +9,7 @@ authors = [
 requires-python = ">=3.13"
 dependencies = [
     "fastapi[standard]>=0.162.2",
+    "litellm>=1.109.1",
     "pydantic-settings>=2.16.2",
 ]
 
@@ -27,6 +28,8 @@ dev = [
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+# LiteLLM's own TypedDicts trigger this pydantic warning; it is not from our code.
+filterwarnings = ["ignore:Items? '.*' on TypedDict class .*ReadOnly:UserWarning"]
 
 [tool.ruff]
 line-length = 100

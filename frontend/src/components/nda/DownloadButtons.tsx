@@ -3,9 +3,10 @@ import type { NdaFormData } from "@/lib/nda/types";
 interface Props {
   markdown: string;
   data: NdaFormData;
-  isValid: boolean;
-  /** Called when a download is clicked while the form is incomplete. */
-  onInvalidAttempt: () => void;
+  /** Labels of fields still missing or invalid; downloads are disabled until empty. */
+  missing: string[];
+  /** True while the assistant is replying, so a late reply cannot undo a reset. */
+  resetDisabled: boolean;
   onReset: () => void;
 }
 
@@ -41,17 +42,15 @@ function printPdf(name: string) {
   window.print();
 }
 
-// `aria-disabled` (not `disabled`) so a click on an incomplete form still
-// fires and can reveal what's missing.
-const disabledStyle = "aria-disabled:cursor-not-allowed aria-disabled:opacity-40";
+const disabledStyle = "disabled:cursor-not-allowed disabled:opacity-40";
 const primary = `rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300 ${disabledStyle}`;
 const secondary = `rounded-md border border-zinc-300 px-4 py-2 text-sm font-medium hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800 ${disabledStyle}`;
 
-export function DownloadButtons({ markdown, data, isValid, onInvalidAttempt, onReset }: Props) {
+export function DownloadButtons({ markdown, data, missing, resetDisabled, onReset }: Props) {
   const name = fileName(data);
-  const guarded = (action: () => void) => () => (isValid ? action() : onInvalidAttempt());
+  const isValid = missing.length === 0;
   const confirmReset = () => {
-    if (window.confirm("Clear all fields and start over?")) onReset();
+    if (window.confirm("Clear the conversation and all fields, and start over?")) onReset();
   };
 
   return (
@@ -60,27 +59,32 @@ export function DownloadButtons({ markdown, data, isValid, onInvalidAttempt, onR
         <button
           type="button"
           className={primary}
-          aria-disabled={!isValid}
-          onClick={guarded(() => printPdf(name))}
+          disabled={!isValid}
+          onClick={() => printPdf(name)}
         >
           Download PDF
         </button>
         <button
           type="button"
           className={secondary}
-          aria-disabled={!isValid}
-          onClick={guarded(() => downloadMarkdown(markdown, name))}
+          disabled={!isValid}
+          onClick={() => downloadMarkdown(markdown, name)}
         >
           Download .md
         </button>
-        <button type="button" className={`${secondary} ml-auto`} onClick={confirmReset}>
+        <button
+          type="button"
+          className={`${secondary} ml-auto`}
+          disabled={resetDisabled}
+          onClick={confirmReset}
+        >
           Reset
         </button>
       </div>
       <p className="text-xs text-zinc-500" aria-live="polite">
         {isValid
           ? "PDF opens your browser's print dialog — choose “Save as PDF”."
-          : "Complete the required fields to download. Missing values are highlighted in the preview."}
+          : `Still needed: ${missing.join(", ")}.`}
       </p>
     </div>
   );
